@@ -20,7 +20,7 @@ namespace DesktopShark
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HTCAPTION = 0x2;
 
-        bool _isFacingLeft = true;
+        bool _isFacingLeft;
 
         private bool isDragging = false;
         private Point dragCursor;
@@ -63,7 +63,18 @@ namespace DesktopShark
             // Handle the MouseUp event to stop dragging
             pictureBox1.MouseUp += new MouseEventHandler(frmMain_MouseUp);
 
-            pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleL);
+            // Randomize if it starts looking left or right
+            var r = new Random(DateTime.Now.GetHashCode());
+            if (r.Next(0, 2) == 0)
+            {
+                _isFacingLeft = true;
+                pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleL);
+            }
+            else
+            {
+                _isFacingLeft = false;
+                pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleR);
+            }
         }
 
         private void LoadSettings()
