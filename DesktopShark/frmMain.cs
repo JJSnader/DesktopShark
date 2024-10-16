@@ -9,17 +9,6 @@ namespace DesktopShark
 {
     public partial class frmMain : Form
     {
-        // Import the SendMessage and ReleaseCapture functions from user32.dll
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-
-        [DllImport("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        // Constants for dragging the window
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HTCAPTION = 0x2;
-
         bool _isFacingLeft;
 
         private bool isDragging = false;
@@ -122,12 +111,15 @@ namespace DesktopShark
             Random rand = new Random();
             int newX, newY;
 
+            var virtualScreen = SystemInformation.VirtualScreen;
+
             do
             {
-                newX = rand.Next(0, Screen.PrimaryScreen.WorkingArea.Width);
-                newY = rand.Next(0, Screen.PrimaryScreen.WorkingArea.Height);
+                newX = rand.Next(virtualScreen.Left, virtualScreen.Right - Width);
+                newY = rand.Next(virtualScreen.Top, virtualScreen.Bottom - Height);
             }
-            while (Math.Abs(newX - this.Location.X) < 100 || Math.Abs(newY - this.Location.Y) < 100);
+            while ((Math.Abs(newX - this.Location.X) < 100 || Math.Abs(newY - this.Location.Y) < 100)
+            && (Math.Abs(newX - Location.X) > 200 || Math.Abs(newY - Location.Y) > 200));
 
             targetLocation = new Point(newX, newY);
             if (newX > Location.X)
@@ -149,6 +141,7 @@ namespace DesktopShark
                 }
                 pictureBox1.Image = LoadGifFromBytes(Properties.Resources.swimL);
             }
+
             _idleTimer.Stop();
             _moveTimer.Start(); // Start the timer to move the form
         }
