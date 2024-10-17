@@ -14,6 +14,7 @@ namespace DesktopShark
         public bool FollowCursor { get; set; }
         public bool IAmSpeed { get; set; }
         public int ChaseProbability { get; set; }
+        public string[] SharkNames { get; set; }
 
         public Settings()
         {
@@ -23,18 +24,18 @@ namespace DesktopShark
             ChaseCursorEnabled = false;
             FollowCursor = false;
             ChaseProbability = 10;
+            SharkNames = ["John", "Michael", "David", "James", "Robert", "William", "Christopher", "Matthew", "Daniel", "Joseph", "Charles", "Thomas", "Richard", "Mark", "Anthony", "Kevin", "Brian", "Edward", "Paul", "Steven"];
         }
     }
     internal static class SettingsFilePath
     {
-        private const string APPNAME = "DesktopShark";
         public static string GetSettingsFilePath(int instanceID)
         {
-            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), $"{APPNAME}\\SharkSettings{instanceID}.json");
+            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), $"{Application.ProductName}\\SharkSettings{instanceID}.json");
         }
         public static string GetSettingsDirectory()
         {
-            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), APPNAME);
+            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Application.ProductName ?? "");
         }
     }
 }

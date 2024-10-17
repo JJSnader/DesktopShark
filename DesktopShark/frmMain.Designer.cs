@@ -55,7 +55,7 @@
             Name = "frmMain";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Form1";
+            Text = "Shark";
             TopMost = true;
             TransparencyKey = SystemColors.Control;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();

@@ -25,7 +25,7 @@ namespace DesktopShark
             if (!File.Exists(SettingsFilePath.GetSettingsFilePath(_instanceID)))
             {
                 _settings = new Settings();
-                File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
+                File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings, Formatting.Indented));
             }
             else
             {
@@ -34,8 +34,8 @@ namespace DesktopShark
                 if (_settings == null)
                 {
                     _settings = new Settings();
-                    File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
-                }
+                    File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings, Formatting.Indented));
+                }   
             }
 
             cbAlwaysOnTop.Checked = _settings.AlwaysOnTop;
@@ -62,7 +62,7 @@ namespace DesktopShark
                 ChaseProbability = (int)tbChaseProb.Value
             };
 
-            File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
+            File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings, Formatting.Indented));
             Close();
         }
 
@@ -97,6 +97,28 @@ namespace DesktopShark
                 UseShellExecute = false,
                 ErrorDialog = true,
                 WindowStyle = ProcessWindowStyle.Normal
+            });
+        }
+
+        private void llEditFile_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            _settings = new Settings()
+            {
+                AlwaysOnTop = cbAlwaysOnTop.Checked,
+                SecondsBetweenMoving = tbSeconds.Value,
+                IAmSpeed = cbIAmSpeed.Checked,
+                ChaseCursorEnabled = cbChaseCursor.Checked,
+                FollowCursor = cbFollowCursor.Checked,
+                ChaseProbability = (int)tbChaseProb.Value
+            };
+
+            File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings, Formatting.Indented));
+
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = SettingsFilePath.GetSettingsFilePath(_instanceID),
+                UseShellExecute = true,
+                ErrorDialog = true
             });
         }
     }

@@ -92,6 +92,11 @@ namespace DesktopShark
                 _isFacingLeft = false;
                 pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleR);
             }
+
+            if (_settings?.SharkNames?.Length > 0)
+            {
+                this.Text = _settings.SharkNames[_rand.Next(0, _settings.SharkNames.Length)];
+            }
         }
 
         private void LoadSettings()
@@ -109,13 +114,13 @@ namespace DesktopShark
                 if (_settings == null)
                 {
                     _settings = new Settings();
-                    File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
+                    File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings, Formatting.Indented));
                 }
             }
             else
             {
                 _settings = new Settings();
-                File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
+                File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings, Formatting.Indented));
             }
         }
 

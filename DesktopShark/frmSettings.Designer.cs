@@ -42,6 +42,7 @@
             cbRunOnStartup = new CheckBox();
             llTerminate = new LinkLabel();
             llExtraShark = new LinkLabel();
+            llEditFile = new LinkLabel();
             ((System.ComponentModel.ISupportInitialize)tbSeconds).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tbChaseProb).BeginInit();
             SuspendLayout();
@@ -188,12 +189,26 @@
             llExtraShark.Text = "Extra shark";
             llExtraShark.LinkClicked += llExtraShark_LinkClicked;
             // 
+            // llEditFile
+            // 
+            llEditFile.Anchor = AnchorStyles.Bottom;
+            llEditFile.AutoSize = true;
+            llEditFile.LinkColor = Color.FromArgb(127, 133, 245);
+            llEditFile.Location = new Point(268, 31);
+            llEditFile.Name = "llEditFile";
+            llEditFile.Size = new Size(46, 15);
+            llEditFile.TabIndex = 13;
+            llEditFile.TabStop = true;
+            llEditFile.Text = "Edit file";
+            llEditFile.LinkClicked += llEditFile_LinkClicked;
+            // 
             // frmSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(40, 40, 40);
             ClientSize = new Size(326, 391);
+            Controls.Add(llEditFile);
             Controls.Add(llExtraShark);
             Controls.Add(llTerminate);
             Controls.Add(cbRunOnStartup);
@@ -236,5 +251,6 @@
         private CheckBox cbRunOnStartup;
         private LinkLabel llTerminate;
         private LinkLabel llExtraShark;
+        private LinkLabel llEditFile;
     }
 }
