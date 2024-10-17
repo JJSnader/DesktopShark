@@ -1,8 +1,10 @@
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Media;
 using System.Runtime.InteropServices;
 
 namespace DesktopShark
@@ -10,25 +12,37 @@ namespace DesktopShark
     public partial class frmMain : Form
     {
         bool _isFacingLeft;
-
+        // dragging vars
         private bool isDragging = false;
         private Point dragCursor;
         private Point dragForm;
-
+        // movement vars
+        private bool _chaseCursor = false;
         private Point targetLocation;
-
+        // timers
         System.Windows.Forms.Timer _moveTimer;
         System.Windows.Forms.Timer _idleTimer;
-
+        System.Windows.Forms.Timer _showCursorTimer;
+        // objects
         private MemoryStream? _memoryStream;
         private Settings? _settings;
+        private Random _rand;
+        private SoundPlayer _player;
+        // chase vars
+        private bool allowCursorGrab;
+        private int letGoCounter;
+        private bool _cursorGrabbed = false;
+
+        private const int DefaultMoveInterval = 50;
 
         public frmMain()
         {
             InitializeComponent();
             LoadSettings(); 
 
-            _moveTimer = new System.Windows.Forms.Timer() { Interval = 50 };
+            _rand = new Random(DateTime.Now.GetHashCode());
+
+            _moveTimer = new System.Windows.Forms.Timer() { Interval = DefaultMoveInterval };
             if (_settings?.IAmSpeed ?? false)
             {
                 _moveTimer.Interval = 1;
@@ -44,7 +58,15 @@ namespace DesktopShark
                 _idleTimer.Interval = 500;
             }
             _idleTimer.Tick += IdleTimer_Elapsed;
-            _idleTimer.Start();
+
+            if (_settings?.FollowCursor ?? false)
+                _moveTimer.Start();
+            else
+                _idleTimer.Start();
+
+            _showCursorTimer = new System.Windows.Forms.Timer();
+            _showCursorTimer.Interval = 5000;
+            _showCursorTimer.Tick += ShowCursorTimer_Elapsed;
 
             pictureBox1.MouseDown += frmMain_MouseDown;
             // Handle the MouseMove event for dragging
@@ -53,8 +75,7 @@ namespace DesktopShark
             pictureBox1.MouseUp += new MouseEventHandler(frmMain_MouseUp);
 
             // Randomize if it starts looking left or right
-            var r = new Random(DateTime.Now.GetHashCode());
-            if (r.Next(0, 2) == 0)
+            if (_rand.Next(0, 2) == 0)
             {
                 _isFacingLeft = true;
                 pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleL);
@@ -76,23 +97,13 @@ namespace DesktopShark
                 _settings = JsonConvert.DeserializeObject<Settings>(settings);
                 if (_settings == null)
                 {
-                    _settings = new Settings()
-                    {
-                        AlwaysOnTop = true,
-                        SecondsBetweenMoving = 10,
-                        IAmSpeed = false
-                    };
+                    _settings = new Settings();
                     File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
                 }
             }
             else
             {
-                _settings = new Settings()
-                {
-                    AlwaysOnTop = true,
-                    SecondsBetweenMoving = 10,
-                    IAmSpeed = false
-                };
+                _settings = new Settings();
                 File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
             }
         }
@@ -108,15 +119,14 @@ namespace DesktopShark
 
         private void MoveToRandomLocation()
         {
-            Random rand = new Random();
             int newX, newY;
 
             var virtualScreen = SystemInformation.VirtualScreen;
 
             do
             {
-                newX = rand.Next(virtualScreen.Left, virtualScreen.Right - Width);
-                newY = rand.Next(virtualScreen.Top, virtualScreen.Bottom - Height);
+                newX = _rand.Next(virtualScreen.Left, virtualScreen.Right - Width);
+                newY = _rand.Next(virtualScreen.Top, virtualScreen.Bottom - Height);
             }
             while ((Math.Abs(newX - this.Location.X) < 100 || Math.Abs(newY - this.Location.Y) < 100)
             && (Math.Abs(newX - Location.X) > 200 || Math.Abs(newY - Location.Y) > 200));
@@ -162,11 +172,65 @@ namespace DesktopShark
 
         private void IdleTimer_Elapsed(object? sender, EventArgs e)
         {
-            MoveToRandomLocation();
+            if (_settings?.ChaseCursorEnabled ?? false)
+            {
+                if (_cursorGrabbed)
+                {
+                    _cursorGrabbed = false;
+                    Cursor = Cursors.Default;
+                }
+                if (_rand.Next(0, 100) < (_settings?.ChaseProbability ?? 10))
+                {
+                    _chaseCursor = true;
+                    _idleTimer.Stop();
+                    if (_isFacingLeft)
+                    {
+                        pictureBox1.Image = LoadGifFromBytes(Properties.Resources.chaseL);
+                    }
+                    else
+                    {
+                        pictureBox1.Image = LoadGifFromBytes(Properties.Resources.chaseR);
+                    }
+                    _player = new SoundPlayer(new MemoryStream(Properties.Resources.chase));
+                    _player.PlayLooping();
+                    TopMost = true;
+                    ChaseCursor();
+                    _moveTimer.Interval = 1;
+                    _moveTimer.Start();
+                }
+                else if (_settings?.FollowCursor ?? false)
+                {
+                    FollowCursor();
+                }
+                else
+                {
+                    MoveToRandomLocation();
+                }
+            }
+            else if (_settings?.FollowCursor ?? false)
+            {
+                FollowCursor();
+            }
+            else
+            {
+                MoveToRandomLocation();
+            }
         }
 
         private void MoveTimer_Elapsed(object? sender, EventArgs e)
         {
+            if (_chaseCursor)
+            {
+                ChaseCursor();
+                return;
+            }
+
+            if ( _settings?.FollowCursor ?? false)
+            {
+                FollowCursor();
+                return;
+            }
+
             // Calculate the distance to the target
             int deltaX = targetLocation.X - this.Location.X;
             int deltaY = targetLocation.Y - this.Location.Y;
@@ -177,7 +241,7 @@ namespace DesktopShark
                 int moveX = Math.Sign(deltaX) * Math.Min(5, Math.Abs(deltaX));
                 int moveY = Math.Sign(deltaY) * Math.Min(5, Math.Abs(deltaY));
 
-                this.Location = new Point(this.Location.X + moveX, this.Location.Y + moveY);
+                Location = new Point(this.Location.X + moveX, this.Location.Y + moveY);
             }
             else
             {
@@ -188,8 +252,17 @@ namespace DesktopShark
             }
         }
 
+        private void ShowCursorTimer_Elapsed(object? sender, EventArgs e)
+        {
+            _showCursorTimer.Stop();
+            Cursor.Show();
+        }
+
         private void frmMain_MouseDown(object? sender, MouseEventArgs e)
         {
+            if (_cursorGrabbed)
+                return;
+
             if (e.Button == MouseButtons.Left)
             {
                 _moveTimer.Stop();
@@ -210,6 +283,7 @@ namespace DesktopShark
             {
                 _moveTimer.Stop();
                 _idleTimer.Stop();
+                _player?.Stop();
                 SetIdleImage();
                 var frm = new frmSettings();
                 frm.ShowDialog();
@@ -223,7 +297,7 @@ namespace DesktopShark
                 }
                 else
                 {
-                    _moveTimer.Interval = 50;
+                    _moveTimer.Interval = DefaultMoveInterval;
                     _idleTimer.Interval = (int)(_settings?.SecondsBetweenMoving ?? 10) * 1000;                    
                 }
 
@@ -238,16 +312,114 @@ namespace DesktopShark
                 Point dif = Point.Subtract(Cursor.Position, new Size(dragCursor));
                 this.Location = Point.Add(dragForm, new Size(dif));
             }
+            else if (_cursorGrabbed)
+            {
+                Point formCenter = new Point(Left + Width / 2, Top + Height / 2);
+                Cursor.Position = formCenter;
+            }
         }
 
         private void frmMain_MouseUp(object? sender, MouseEventArgs e)
         {
+            if (_cursorGrabbed)
+                return; 
+
             if (e.Button == MouseButtons.Left)
             {
                 isDragging = false;
                 SetIdleImage();
-                _idleTimer.Start();
+                if (_settings?.FollowCursor ?? false)
+                    _moveTimer.Start();
+                else
+                    _idleTimer.Start();
             }
+        }
+
+        #endregion
+        #region Cursor Chasing
+
+        private void ChaseCursor()
+        {
+            Point cursorPosition = Cursor.Position;
+
+            // Get the center position of the form
+            Point formCenter = new(Left + Width / 2, Top + Height / 2);
+
+            double distanceToCursor = GetDistance(formCenter, cursorPosition);
+
+            // Move towards the cursor if not on top of it
+            if (distanceToCursor > 20)
+            {
+                MoveTowardCursor(cursorPosition, formCenter);
+            }
+            else
+            {
+                Cursor.Hide();
+                _showCursorTimer.Start();
+                TopMost = _settings?.AlwaysOnTop ?? false;
+                Cursor.Position = formCenter;
+                _cursorGrabbed = true;
+                _chaseCursor = false;
+                _player.Stop();
+                SetIdleImage();
+                _moveTimer.Interval = DefaultMoveInterval;
+                if (!(_settings?.FollowCursor ?? false))
+                {
+                    _moveTimer.Stop();
+                    _idleTimer.Start();
+                }
+            }
+        }
+
+        private void FollowCursor()
+        {
+            Point cursorPosition = Cursor.Position;
+            Point formCenter = new Point(Left + Width / 2, Top + Height / 2);
+            double distanceToCursor = GetDistance(formCenter, cursorPosition);
+            if (distanceToCursor > 20)
+            {
+                MoveTowardCursor(cursorPosition, formCenter);
+            }
+        }
+
+        private void MoveTowardCursor(Point cursorPosition, Point formCenter)
+        {
+            // Calculate the direction vector towards the cursor
+            int deltaX = cursorPosition.X - formCenter.X;
+            int deltaY = cursorPosition.Y - formCenter.Y;
+
+            // Normalize the direction to move the form in small steps
+            double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+            double stepX = (deltaX / distance) * 5; // Move 5 pixels per tick in X direction
+            double stepY = (deltaY / distance) * 5; // Move 5 pixels per tick in Y direction
+
+            // Update the form's position by adding the calculated step
+            if (stepX < 0 && !_isFacingLeft)
+            {
+                _isFacingLeft = true;
+                if (_chaseCursor)
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.chaseL);
+                else 
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.swimL);
+            }
+            else if (stepX > 0 && _isFacingLeft)
+            {
+                _isFacingLeft = false;
+                if (_chaseCursor)
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.chaseR);
+                else
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.swimR);
+            }
+            Left += (int)stepX;
+            Top += (int)stepY;
+        }
+
+        private double GetDistance(Point point1, Point point2)
+        {
+            // Calculate the distance between two points
+            int dx = point1.X - point2.X;
+            int dy = point1.Y - point2.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
         }
 
         #endregion

@@ -12,6 +12,19 @@ namespace DesktopShark
 
         public bool AlwaysOnTop { get; set; }
         public decimal SecondsBetweenMoving { get; set; }
+        public bool ChaseCursorEnabled { get; set; }
+        public bool FollowCursor { get; set; }
         public bool IAmSpeed { get; set; }
+        public int ChaseProbability { get; set; }
+
+        public Settings()
+        {
+            AlwaysOnTop = true;
+            SecondsBetweenMoving = 20;
+            IAmSpeed = false;
+            ChaseCursorEnabled = false;
+            FollowCursor = false;
+            ChaseProbability = 10;
+        }
     }
 }

@@ -63,6 +63,46 @@ namespace DesktopShark.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] chase {
+            get {
+                object obj = ResourceManager.GetObject("chase", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] chaseL {
+            get {
+                object obj = ResourceManager.GetObject("chaseL", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] chaseLslow {
+            get {
+                object obj = ResourceManager.GetObject("chaseLslow", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] chaseR {
+            get {
+                object obj = ResourceManager.GetObject("chaseR", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] dragL {
             get {
                 object obj = ResourceManager.GetObject("dragL", resourceCulture);

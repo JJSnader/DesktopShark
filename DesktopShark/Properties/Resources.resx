@@ -139,4 +139,13 @@
   <data name="dragR" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dragR.gif;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="chaseL" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\chaseL.gif;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="chaseR" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\chaseR.gif;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="chase" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\chase.wav;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>
