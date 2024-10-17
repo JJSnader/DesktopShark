@@ -288,6 +288,7 @@ namespace DesktopShark
         private void ShowCursorTimer_Elapsed(object? sender, EventArgs e)
         {
             _showCursorTimer.Stop();
+            _cursorGrabbed = false;
             Cursor.Show();
         }
 
