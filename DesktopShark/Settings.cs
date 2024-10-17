@@ -8,8 +8,6 @@ namespace DesktopShark
 {
     internal class Settings
     {
-        public const string SettingsFilePath = @"C:\ProgramData\sharksettings.json";
-
         public bool AlwaysOnTop { get; set; }
         public decimal SecondsBetweenMoving { get; set; }
         public bool ChaseCursorEnabled { get; set; }
@@ -25,6 +23,18 @@ namespace DesktopShark
             ChaseCursorEnabled = false;
             FollowCursor = false;
             ChaseProbability = 10;
+        }
+    }
+    internal static class SettingsFilePath
+    {
+        private const string APPNAME = "DesktopShark";
+        public static string GetSettingsFilePath(int instanceID)
+        {
+            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), $"{APPNAME}\\SharkSettings{instanceID}.json");
+        }
+        public static string GetSettingsDirectory()
+        {
+            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), APPNAME);
         }
     }
 }
