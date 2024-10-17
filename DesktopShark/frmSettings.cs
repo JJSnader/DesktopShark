@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 
 namespace DesktopShark
@@ -41,6 +42,10 @@ namespace DesktopShark
             cbIAmSpeed.Checked = _settings.IAmSpeed;
             cbFollowCursor.Checked = _settings.FollowCursor;
             tbChaseProb.Value = _settings.ChaseProbability;
+            using (RegistryKey? regKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false))
+            {
+                cbRunOnStartup.Checked = regKey?.GetValue(Application.ProductName) != null;
+            }
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -57,6 +62,29 @@ namespace DesktopShark
 
             File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
             Close();
+        }
+
+        private void cbRunOnStartup_CheckedChanged(object sender, EventArgs e)
+        {
+            using (RegistryKey? regKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+            {
+                if (cbRunOnStartup.Checked)
+                {
+                    regKey?.SetValue(Application.ProductName, "\"" + Application.ExecutablePath + "\"");
+                }
+                else
+                {
+                    if (regKey?.GetValue(Application.ProductName) != null)
+                    {
+                        regKey?.DeleteValue(Application.ProductName ?? "", false);
+                    }
+                }
+            }
+        }
+
+        private void llTerminate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

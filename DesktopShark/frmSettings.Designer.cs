@@ -38,17 +38,20 @@
             cbFollowCursor = new CheckBox();
             label3 = new Label();
             tbChaseProb = new NumericUpDown();
+            cbRunOnStartup = new CheckBox();
+            llTerminate = new LinkLabel();
             ((System.ComponentModel.ISupportInitialize)tbSeconds).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tbChaseProb).BeginInit();
             SuspendLayout();
             // 
             // btnSave
             // 
+            btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnSave.BackColor = Color.Black;
             btnSave.FlatStyle = FlatStyle.Flat;
             btnSave.Font = new Font("Segoe UI", 14F);
             btnSave.ForeColor = Color.White;
-            btnSave.Location = new Point(241, 285);
+            btnSave.Location = new Point(241, 339);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(73, 40);
             btnSave.TabIndex = 0;
@@ -145,12 +148,38 @@
             tbChaseProb.TabIndex = 8;
             tbChaseProb.Value = new decimal(new int[] { 10, 0, 0, 0 });
             // 
+            // cbRunOnStartup
+            // 
+            cbRunOnStartup.AutoSize = true;
+            cbRunOnStartup.Font = new Font("Segoe UI", 12F);
+            cbRunOnStartup.Location = new Point(12, 333);
+            cbRunOnStartup.Name = "cbRunOnStartup";
+            cbRunOnStartup.Size = new Size(185, 25);
+            cbRunOnStartup.TabIndex = 10;
+            cbRunOnStartup.Text = "Run on system startup";
+            cbRunOnStartup.UseVisualStyleBackColor = true;
+            cbRunOnStartup.CheckedChanged += cbRunOnStartup_CheckedChanged;
+            // 
+            // llTerminate
+            // 
+            llTerminate.AutoSize = true;
+            llTerminate.LinkColor = Color.FromArgb(127, 133, 245);
+            llTerminate.Location = new Point(12, 364);
+            llTerminate.Name = "llTerminate";
+            llTerminate.Size = new Size(90, 15);
+            llTerminate.TabIndex = 11;
+            llTerminate.TabStop = true;
+            llTerminate.Text = "Terminate shark";
+            llTerminate.LinkClicked += llTerminate_LinkClicked;
+            // 
             // frmSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(40, 40, 40);
-            ClientSize = new Size(326, 337);
+            ClientSize = new Size(326, 391);
+            Controls.Add(llTerminate);
+            Controls.Add(cbRunOnStartup);
             Controls.Add(label3);
             Controls.Add(tbChaseProb);
             Controls.Add(btnSave);
@@ -185,5 +214,7 @@
         private CheckBox cbFollowCursor;
         private Label label3;
         private NumericUpDown tbChaseProb;
+        private CheckBox cbRunOnStartup;
+        private LinkLabel llTerminate;
     }
 }
