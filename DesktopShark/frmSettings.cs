@@ -14,24 +14,25 @@ namespace DesktopShark
     public partial class frmSettings : Form
     {
         private Settings? _settings;
+        private int _instanceID;
 
-        public frmSettings()
+        public frmSettings(int instanceID)
         {
             InitializeComponent();
 
-            if (!File.Exists(Settings.SettingsFilePath))
+            if (!File.Exists(SettingsFilePath.GetSettingsFilePath(_instanceID)))
             {
                 _settings = new Settings();
-                File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
+                File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
             }
             else
             {
-                var settings = File.ReadAllText(Settings.SettingsFilePath);
+                var settings = File.ReadAllText(SettingsFilePath.GetSettingsFilePath(_instanceID));
                 _settings = JsonConvert.DeserializeObject<Settings>(settings);
                 if (_settings == null)
                 {
                     _settings = new Settings();
-                    File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
+                    File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
                 }
             }
 
@@ -55,7 +56,7 @@ namespace DesktopShark
                 ChaseProbability = (int)tbChaseProb.Value
             };
 
-            File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
+            File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
             Close();
         }
     }
