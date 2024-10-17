@@ -35,10 +35,12 @@ namespace DesktopShark
         private bool _cursorGrabbed = false;
 
         private const int DefaultMoveInterval = 50;
+        private int _instanceID;
 
-        public frmMain()
+        public frmMain(int instanceID)
         {
             InitializeComponent();
+            _instanceID = instanceID;
             LoadSettings(); 
 
             _rand = new Random(DateTime.Now.GetHashCode());
@@ -94,22 +96,26 @@ namespace DesktopShark
 
         private void LoadSettings()
         {
-
-            // Get settings
-            if (File.Exists(Settings.SettingsFilePath))
+            // Create the settings directory if it doesn't exist
+            if (!Directory.Exists(SettingsFilePath.GetSettingsDirectory()))
             {
-                var settings = File.ReadAllText(Settings.SettingsFilePath);
+                Directory.CreateDirectory(SettingsFilePath.GetSettingsDirectory());
+            }
+            // Get settings
+            if (File.Exists(SettingsFilePath.GetSettingsFilePath(_instanceID)))
+            {
+                var settings = File.ReadAllText(SettingsFilePath.GetSettingsFilePath(_instanceID));
                 _settings = JsonConvert.DeserializeObject<Settings>(settings);
                 if (_settings == null)
                 {
                     _settings = new Settings();
-                    File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
+                    File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
                 }
             }
             else
             {
                 _settings = new Settings();
-                File.WriteAllText(Settings.SettingsFilePath, JsonConvert.SerializeObject(_settings));
+                File.WriteAllText(SettingsFilePath.GetSettingsFilePath(_instanceID), JsonConvert.SerializeObject(_settings));
             }
         }
 
@@ -313,7 +319,7 @@ namespace DesktopShark
                 _idleTimer.Stop();
                 _player?.Stop();
                 SetIdleImage(false);
-                var frm = new frmSettings();
+                var frm = new frmSettings(_instanceID);
                 frm.ShowDialog();
 
                 LoadSettings();

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace DesktopShark
 {
     internal static class Program
@@ -11,7 +13,8 @@ namespace DesktopShark
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new frmMain());
+            Process[] pname = Process.GetProcessesByName("DesktopShark");
+            Application.Run(new frmMain(pname.Length - 1));
         }
     }
 }
