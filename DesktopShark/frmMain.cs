@@ -22,6 +22,7 @@ namespace DesktopShark
         // timers
         System.Windows.Forms.Timer _moveTimer;
         System.Windows.Forms.Timer _idleTimer;
+        System.Windows.Forms.Timer _changeIdleImageTimer;
         System.Windows.Forms.Timer _showCursorTimer;
         // objects
         private MemoryStream? _memoryStream;
@@ -58,6 +59,10 @@ namespace DesktopShark
                 _idleTimer.Interval = 500;
             }
             _idleTimer.Tick += IdleTimer_Elapsed;
+
+            _changeIdleImageTimer = new System.Windows.Forms.Timer();
+            _changeIdleImageTimer.Interval = 3400;
+            _changeIdleImageTimer.Tick += ChangeIdleImageTimer_Elapsed;
 
             if (_settings?.FollowCursor ?? false)
                 _moveTimer.Start();
@@ -156,15 +161,31 @@ namespace DesktopShark
             _moveTimer.Start(); // Start the timer to move the form
         }
 
-        private void SetIdleImage()
+        private void SetIdleImage(bool canTurn)
         {
             if (_isFacingLeft)
             {
-                pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleL);
+                if (canTurn && _rand.Next(0, 10) < 4)
+                {
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.turnL);
+                    _changeIdleImageTimer.Start();
+                }
+                else
+                {
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleL);
+                }
             }
             else
             {
-                pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleR);
+                if (canTurn && _rand.Next(0, 10) < 4)
+                {
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.turnR);
+                    _changeIdleImageTimer.Start();
+                }
+                else
+                {
+                    pictureBox1.Image = LoadGifFromBytes(Properties.Resources.idleR);
+                }
             }
         }
 
@@ -217,6 +238,12 @@ namespace DesktopShark
             }
         }
 
+        private void ChangeIdleImageTimer_Elapsed(object? sender, EventArgs e)
+        {
+            _changeIdleImageTimer.Stop();
+            SetIdleImage(false);
+        }
+
         private void MoveTimer_Elapsed(object? sender, EventArgs e)
         {
             if (_chaseCursor)
@@ -247,7 +274,7 @@ namespace DesktopShark
             {
                 // Stop the timer when the form reaches the target location
                 _moveTimer.Stop();
-                SetIdleImage();
+                SetIdleImage(true);
                 _idleTimer.Start();
             }
         }
@@ -284,7 +311,7 @@ namespace DesktopShark
                 _moveTimer.Stop();
                 _idleTimer.Stop();
                 _player?.Stop();
-                SetIdleImage();
+                SetIdleImage(false);
                 var frm = new frmSettings();
                 frm.ShowDialog();
 
@@ -327,7 +354,7 @@ namespace DesktopShark
             if (e.Button == MouseButtons.Left)
             {
                 isDragging = false;
-                SetIdleImage();
+                SetIdleImage(true);
                 if (_settings?.FollowCursor ?? false)
                     _moveTimer.Start();
                 else
@@ -361,7 +388,7 @@ namespace DesktopShark
                 _cursorGrabbed = true;
                 _chaseCursor = false;
                 _player.Stop();
-                SetIdleImage();
+                SetIdleImage(true);
                 _moveTimer.Interval = DefaultMoveInterval;
                 if (!(_settings?.FollowCursor ?? false))
                 {
