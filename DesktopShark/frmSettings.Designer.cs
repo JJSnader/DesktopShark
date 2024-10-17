@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
             btnSave = new Button();
             label1 = new Label();
             cbAlwaysOnTop = new CheckBox();
@@ -192,6 +193,7 @@
             Controls.Add(label1);
             ForeColor = Color.White;
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "frmSettings";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;

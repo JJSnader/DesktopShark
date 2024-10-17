@@ -50,6 +50,7 @@
             ClientSize = new Size(256, 200);
             Controls.Add(pictureBox1);
             FormBorderStyle = FormBorderStyle.None;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 2, 3, 2);
             Name = "frmMain";
             ShowInTaskbar = false;
