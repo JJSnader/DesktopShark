@@ -41,6 +41,7 @@
             tbChaseProb = new NumericUpDown();
             cbRunOnStartup = new CheckBox();
             llTerminate = new LinkLabel();
+            llExtraShark = new LinkLabel();
             ((System.ComponentModel.ISupportInitialize)tbSeconds).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tbChaseProb).BeginInit();
             SuspendLayout();
@@ -163,6 +164,7 @@
             // 
             // llTerminate
             // 
+            llTerminate.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             llTerminate.AutoSize = true;
             llTerminate.LinkColor = Color.FromArgb(127, 133, 245);
             llTerminate.Location = new Point(12, 364);
@@ -173,12 +175,26 @@
             llTerminate.Text = "Terminate shark";
             llTerminate.LinkClicked += llTerminate_LinkClicked;
             // 
+            // llExtraShark
+            // 
+            llExtraShark.Anchor = AnchorStyles.Bottom;
+            llExtraShark.AutoSize = true;
+            llExtraShark.LinkColor = Color.FromArgb(127, 133, 245);
+            llExtraShark.Location = new Point(136, 364);
+            llExtraShark.Name = "llExtraShark";
+            llExtraShark.Size = new Size(64, 15);
+            llExtraShark.TabIndex = 12;
+            llExtraShark.TabStop = true;
+            llExtraShark.Text = "Extra shark";
+            llExtraShark.LinkClicked += llExtraShark_LinkClicked;
+            // 
             // frmSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(40, 40, 40);
             ClientSize = new Size(326, 391);
+            Controls.Add(llExtraShark);
             Controls.Add(llTerminate);
             Controls.Add(cbRunOnStartup);
             Controls.Add(label3);
@@ -198,6 +214,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Shark Settings";
+            TopMost = true;
             ((System.ComponentModel.ISupportInitialize)tbSeconds).EndInit();
             ((System.ComponentModel.ISupportInitialize)tbChaseProb).EndInit();
             ResumeLayout(false);
@@ -218,5 +235,6 @@
         private NumericUpDown tbChaseProb;
         private CheckBox cbRunOnStartup;
         private LinkLabel llTerminate;
+        private LinkLabel llExtraShark;
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -86,6 +87,17 @@ namespace DesktopShark
         private void llTerminate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void llExtraShark_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = Application.ExecutablePath,
+                UseShellExecute = false,
+                ErrorDialog = true,
+                WindowStyle = ProcessWindowStyle.Normal
+            });
         }
     }
 }
