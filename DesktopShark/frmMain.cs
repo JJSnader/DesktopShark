@@ -56,10 +56,6 @@ namespace DesktopShark
 
             _idleTimer = new System.Windows.Forms.Timer();
             _idleTimer.Interval = (int)(_settings?.SecondsBetweenMoving ?? 10) * 1000;
-            if (_settings?.IAmSpeed ?? false)
-            {
-                _idleTimer.Interval = 500;
-            }
             _idleTimer.Tick += IdleTimer_Elapsed;
 
             _changeIdleImageTimer = new System.Windows.Forms.Timer();
